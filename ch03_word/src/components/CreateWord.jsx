@@ -1,63 +1,42 @@
-import { useRef } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+// useNavigate: 프로그램 자동 이동(e.g. 로그인 후 메인페이지로 자동 이동)
+import { useNavigate } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 
 export default function CreateWord() {
-    // 현재 날짜들을 읽어옴
-    const days = useFetch("http://localhost:3010/days");
-    // 다른 페이지로 리다이렉트
-    const navigate = useNavigate();
+    const days=useFetch("http://localhost:3010/days");
+    const navigate=useNavigate();
 
-    // submit하면
-    function onSubmit(e) {
+    const [eng, setEng]=useState("");
+    const [kor, setKor]=useState("");
+    const [day, setDay]=useState("");
+
+    const onSubmit=(e)=>{
         e.preventDefault();
 
-        fetch(`http://localhost:3010/words/`, {
+        fetch(`http://localhost:3010/words/`,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            // 입력할 데이터 생성(id는 자동생성)
             body: JSON.stringify({
-                day: dayRef.current.value,
-                eng: engRef.current.value,
-                kor: korRef.current.value,
+                eng,
+                kor,
+                day,
                 isDone: false,
             }),
-        }).then(res => {
-            // 성공하면 해당 날짜로 리다이렉트
-            if (res.ok) {
-                alert("생성이 완료 되었습니다");
-                navigate(`/day/${dayRef.current.value}`);
+        })
+        .then(res=>{
+            if(res.ok){
+                alert("생성이 완료되었습니다.");
+                navigate(`/day/${day}`);
             }
         });
     }
-    // useRef를 이용해 변수 선언
-    const engRef = useRef(null);
-    const korRef = useRef(null);
-    const dayRef = useRef(null);
-
+    
     return (
-        <form onSubmit={onSubmit}>
-            <div className="input_area">
-                <label>Eng</label>
-                <input type="text" placeholder="computer" ref={engRef} />
-            </div>
-            <div className="input_area">
-                <label>Kor</label>
-                <input type="text" placeholder="컴퓨터" ref={korRef} />
-            </div>
-            <div className="input_area">
-                <label>Day</label>
-                <select ref={dayRef}>
-                    {days.map(day => (
-                        <option key={day.id} value={day.day}>
-                            {day.day}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <button>저장</button>
+        <form>
+            
         </form>
     );
 }

@@ -1,49 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import { useReducer } from "react";
 
-function TimerComponent() {
-  useEffect(()=>{
-    const interval=setInterval(()=>{
-      console.log("2초마다 실행됨");
-    }, 2000);
+// 리듀서 함수 정의
+// const reducer=(state: 현재상태, action: 상태를 어떻게 바꿀 지에 대한 지시)
+// action.type: 보내는 명령
+const reducer=(state, action)=>{
+  switch(action.type){
+    case 'INCREMENT':
+      return {
+        ...state, count: state.count+1
+      };
+    case 'CHANGE_TEXT':
+      return{
+        ...state, text: action.payload
+      };
+    case 'TOGGLE':
+      return{
+        ...state, isOn: !state.isOn
+      }
+    case 'RESET':
+      return{
+        count: 0,
+        text: "안녕",
+        isOn: false
+      };
+    default:
+      return state;
+  }
+};
 
-    return ()=>{
-      clearInterval(interval);
-      console.log("타이머 종료");
-    }
-  }, []);
 
-  return <div>타이머가 실행 중입니다. 콘솔을 확인하세요.</div>;
-}
+// 2. 초기 상태
+// 초기값
+const initialState={count: 0, text: "안녕", isOn: true};
 
-
-function EffectExample() {
-  const [count, setCount] = useState(0);
-  const [count2, setCount2] = useState(0);
-
-  // 항상 실행됨 (렌더링될 때마다)
-  useEffect(() => {
-    console.log('항상 실행됨');
-  });
-
-  // 처음 한 번만 실행됨 (마운트 시)
-  useEffect(() => {
-    console.log('처음 한 번만 실행됨');
-  }, []);
-
-  // count가 변경될 때 실행됨
-  useEffect(() => {
-    console.log('count가 변경될 때 실행됨');
-  }, [count]);
+const Counter=()=>{
+  // const [현재 상태값, 상태를 바꾸라고 명령하는 함수]=useReducer(reducer함수, 초기값);
+  const [state, dispatch]=useReducer(reducer, initialState);
 
   return (
     <div>
-      <h1>Count: {count}</h1>
-      <h1>Count2: {count2}</h1>
-      <button onClick={() => setCount(prev => prev + 1)}>Increment count</button>
-      <button onClick={() => setCount2(prev => prev + 1)}>Increment count2</button>
-      <TimerComponent />
+      {/* 4. 변경된 데이터를 그때그때 보여줄 state변수 기술*/}
+      {/* state.count: 현재 상태의 카운트 */}
+      <p>Count: {state.count}</p>
+      <p>Name: {state.text}</p>
+      <p>Toggle: {state.isOn}</p>
+      {/* 5. 디스패치 함수를 사용하여 액션을 보냄 */}
+      <button onClick={() => dispatch({ type: 'INCREMENT' })}>Increment</button>
+      <button onClick={() => dispatch({ type: 'CHANGE_TEXT', payload: '소다?' })}>Change</button>
+      <button onClick={()=>dispatch({type: 'TOGGLE'})}>Toggle</button>
+      <button onClick={() => dispatch({ type: 'RESET' })}>Reset</button>
     </div>
   );
-}
+};
 
-export default EffectExample;
+
+export default Counter;
